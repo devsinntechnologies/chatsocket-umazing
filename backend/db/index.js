@@ -3,7 +3,7 @@ const { Sequelize } = require('sequelize');
 const ChatRoomModel = require('../models/ChatRoom');
 const MessageModel = require('../models/Message');
 const UserModel = require('../models/User');
-const sequelize = new Sequelize('umazing', 'root', '', {
+const sequelize = new Sequelize('umazing', 'root', '1234567890', {
   host: '127.0.0.1',
   dialect: 'mysql',
 });
