@@ -15,12 +15,12 @@ const getUserChatRooms = async (req, res) => {
         {
           model: User,
           as: "User1", // Alias for user_1
-          attributes: ["id", "name", "email"],
+          attributes: ["id", "name", "email", "imageUrl"],
         },
         {
           model: User,
           as: "User2", // Alias for user_2
-          attributes: ["id", "name", "email"],
+          attributes: ["id", "name", "email" , "imageUrl"],
         },
         {
           model: Message,
@@ -58,6 +58,7 @@ const getUserChatRooms = async (req, res) => {
           id: otherUser.id,
           name: otherUser.name,
           email: otherUser.email,
+          imageUrl: otherUser.imageUrl, 
         },
         unreadMessages: unreadCount,
         lastMessage: lastMessage
@@ -98,7 +99,7 @@ const getAllChatsInChatRoom = async (req, res) => {
     // Fetch receiver details
     const receiver = await User.findOne({
       where: { id: receiverId },
-      attributes: ["id", "name", "email"],
+      attributes: ["id", "name", "email", "imageUrl"],
     });
 
     if (!receiver) {
@@ -115,12 +116,12 @@ const getAllChatsInChatRoom = async (req, res) => {
         {
           model: User,
           as: "Sender",
-          attributes: ["id", "name", "email"],
+          attributes: ["id", "name", "email", "imageUrl"],
         },
         {
           model: User,
           as: "Receiver",
-          attributes: ["id", "name", "email"],
+          attributes: ["id", "name", "email", "imageUrl"],
         },
       ],
       order: [["timestamp", "ASC"]],
@@ -134,10 +135,12 @@ const getAllChatsInChatRoom = async (req, res) => {
       sender: {
         id: message.Sender.id,
         name: message.Sender.name,
+        imageUrl: message.Sender.image_url,
       },
       receiver: {
         id: message.Receiver.id,
         name: message.Receiver.name,
+        imageUrl: message.Receiver.image_url,
       },
       isRead: message.read,
     }));
@@ -148,6 +151,8 @@ const getAllChatsInChatRoom = async (req, res) => {
         receiver: {
           id: receiver.id,
           name: receiver.name,
+          email: receiver.email,
+          imageUrl: receiver.imageUrl,
         },
         messages: formattedMessages,
       },
@@ -179,12 +184,12 @@ const sendMessage = async (req, res) => {
         {
           model: User,
           as: "User1", // Alias for user_1
-          attributes: ["id", "name", "email"],
+          attributes: ["id", "name", "email", "imageUrl"],
         },
         {
           model: User,
           as: "User2", // Alias for user_2
-          attributes: ["id", "name", "email"],
+          attributes: ["id", "name", "email", "imageUrl"],
         },
       ],
     });
