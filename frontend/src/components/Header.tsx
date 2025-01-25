@@ -4,6 +4,7 @@ import { useGetUserProfileQuery } from '@/hooks/UseAuth';
 
 const Header = () => {
   const { data, isLoading, isError } = useGetUserProfileQuery({});
+  console.log(data,"Data")
 
   let userName = 'Guest'; // Default username
 
@@ -11,8 +12,8 @@ const Header = () => {
     userName = 'Loading...';
   } else if (isError || !data?.success) {
     userName = 'Error fetching user';
-  } else if (data.success && data.data?.username) {
-    userName = data.data.username;
+  } else if (data.success && data.data?.name) {
+    userName = data.data.name;
   }
 
   return (

@@ -9,7 +9,9 @@ import { RootState } from "@/store/store";
 
 const SingleChat = () => {
   const senderId = useSelector((state: RootState) => state.authSlice?.user?.id);
+  console.log(senderId,'senderId')
   const { id: roomId } = useParams(); // Chat room ID
+  console.log(roomId,'roomId')
   const router = useRouter();
   const socket = getSocket();
 
@@ -82,7 +84,7 @@ const SingleChat = () => {
   // Fetch room details and messages from the server
   const fetchRoomDetails = async () => {
     try {
-      const response = await fetch(`http://192.168.43.191:5000/chat/chat_room/${roomId}`, {
+      const response = await fetch(`http://97.74.89.204:5000/chat/chat_room/${roomId}`, {
         method: "GET",
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
@@ -133,7 +135,7 @@ const SingleChat = () => {
         <button onClick={() => router.push("/")} className="text-gray-600 hover:text-black">
           <ArrowLeft size={20} />
         </button>
-        <h2 className="text-lg text-primary font-semibold">{ receiver?.username ? receiver?.username  :"Chat Room"}</h2>
+        <h2 className="text-lg text-primary font-semibold">{ receiver?.roomName ? receiver?.roomName  :"Chat Room"}</h2>
       </div>
 
       {/* Messages */}

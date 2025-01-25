@@ -8,7 +8,7 @@ let socket: Socket | null = null;
 export const connectSocket = (): Socket => {
   
   if (!socket) {
-    socket = io('http://192.168.43.191:5000', { auth: { token } });
+    socket = io('http://97.74.89.204:5000', { auth: { token } });
      
 
     socket.on("connect", () => {

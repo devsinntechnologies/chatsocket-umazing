@@ -1,2 +1,2 @@
 // src/constants/api.js
-export const BASE_URL = "http://192.168.43.191:5000";
+export const BASE_URL = "http://97.74.89.204:5000";
