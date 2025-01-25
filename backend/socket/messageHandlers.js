@@ -20,12 +20,12 @@ module.exports = (io, socket) => {
           {
             model: User,
             as: 'User1', // Alias for user_1
-            attributes: ['id', 'name', 'email'],
+            attributes: ['id', 'name', 'email', 'imageUrl'],
           },
           {
             model: User,
             as: 'User2', // Alias for user_2
-            attributes: ['id', 'name', 'email'],
+            attributes: ['id', 'name', 'email', 'imageUrl'],
           },
         ],
       });
@@ -49,10 +49,10 @@ module.exports = (io, socket) => {
       });
 
       const sender = await User.findByPk(senderId, {
-        attributes: ['id', 'name', 'email'],
+        attributes: ['id', 'name', 'email', "imageUrl"],
       });
       const receiver = await User.findByPk(receiverId, {
-        attributes: ['id', 'name', 'email'],
+        attributes: ['id', 'name', 'email', "imageUrl"],
       });
 
       // Prepare the message payload
@@ -65,11 +65,13 @@ module.exports = (io, socket) => {
             id: sender.id,
             name: sender.name,
             email: sender.email,
+            imageUrl: sender.imageUrl,
           },
           receiver: {
             id: receiver.id,
             name: receiver.name,
             email: receiver.email,
+            imageUrl: receiver.imageUrl,
           },
           timestamp: message.createdAt,
           isRead: false, // Initially unread
