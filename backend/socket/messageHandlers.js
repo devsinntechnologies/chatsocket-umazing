@@ -118,6 +118,7 @@ module.exports = (io, socket) => {
           timestamp: message.createdAt,
           isRead: messagePayload.message.isRead,
         },
+        unreadMessages: room.Messages.filter((m) =>!m.read).length, // Count unread messages in the room
       };
 
       // Emit to both participants
