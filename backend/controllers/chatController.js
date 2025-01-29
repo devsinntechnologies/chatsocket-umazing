@@ -20,7 +20,7 @@ const getUserChatRooms = async (req, res) => {
         {
           model: User,
           as: "User2", // Alias for user_2
-          attributes: ["id", "name", "email" , "imageUrl"],
+          attributes: ["id", "name", "email", "imageUrl"],
         },
         {
           model: Message,
@@ -58,11 +58,13 @@ const getUserChatRooms = async (req, res) => {
           id: otherUser.id,
           name: otherUser.name,
           email: otherUser.email,
-          imageUrl: otherUser.imageUrl, 
+          imageUrl: otherUser.imageUrl,
         },
         unreadMessages: unreadCount,
         lastMessage: lastMessage
           ? {
+              senderId: lastMessage.SenderId,
+              receiverId: lastMessage.ReceiverId,
               content: lastMessage.message_text,
               timestamp: lastMessage.timestamp,
             }
@@ -86,7 +88,7 @@ const getAllChatsInChatRoom = async (req, res) => {
     const { id: chatRoomId } = req.params;
 
     // Determine user IDs from chatRoomId
-    const [user1, user2] = chatRoomId.split('-').map(String);
+    const [user1, user2] = chatRoomId.split("-").map(String);
     const receiverId = user1 === userId ? user2 : user1;
 
     if (!receiverId) {
@@ -159,10 +161,11 @@ const getAllChatsInChatRoom = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching chats in room:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch chats in room" });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch chats in room" });
   }
 };
-
 
 // Send a message
 const sendMessage = async (req, res) => {
