@@ -1,5 +1,5 @@
-const { ChatRoom, Message, User } = require('../db/index');
-const { Op } = require('sequelize');
+const { ChatRoom, Message, User } = require("../db/index");
+const { Op } = require("sequelize");
 
 module.exports = (io, socket) => {
   // Event: Send Message
@@ -19,19 +19,19 @@ module.exports = (io, socket) => {
         include: [
           {
             model: User,
-            as: 'User1', // Alias for user_1
-            attributes: ['id', 'name', 'email', 'imageUrl'],
+            as: "User1", // Alias for user_1
+            attributes: ["id", "name", "email", "imageUrl"],
           },
           {
             model: User,
-            as: 'User2', // Alias for user_2
-            attributes: ['id', 'name', 'email', 'imageUrl'],
+            as: "User2", // Alias for user_2
+            attributes: ["id", "name", "email", "imageUrl"],
           },
           {
             model: Message,
-            as: 'Messages',
+            as: "Messages",
             where: { read: false, ReceiverId: receiverId },
-            required: false, 
+            required: false,
           },
         ],
       });
@@ -55,10 +55,10 @@ module.exports = (io, socket) => {
       });
 
       const sender = await User.findByPk(senderId, {
-        attributes: ['id', 'name', 'email', "imageUrl"],
+        attributes: ["id", "name", "email", "imageUrl"],
       });
       const receiver = await User.findByPk(receiverId, {
-        attributes: ['id', 'name', 'email', "imageUrl"],
+        attributes: ["id", "name", "email", "imageUrl"],
       });
 
       // Prepare the message payload
@@ -85,7 +85,7 @@ module.exports = (io, socket) => {
       };
 
       // Emit to the sender's socket
-      socket.emit('receiveMessage', messagePayload);
+      socket.emit("receiveMessage", messagePayload);
 
       // Emit to the receiver's socket if connected
       const receiverSocket = Array.from(io.sockets.sockets.values()).find(
@@ -93,7 +93,7 @@ module.exports = (io, socket) => {
       );
 
       if (receiverSocket) {
-        receiverSocket.emit('receiveMessage', messagePayload);
+        receiverSocket.emit("receiveMessage", messagePayload);
 
         // Mark the message as read if the receiver is in the room
         if (receiverSocket.rooms.has(room.id)) {
@@ -101,13 +101,13 @@ module.exports = (io, socket) => {
           messagePayload.message.isRead = true;
 
           // Notify the sender that the message is read
-          socket.emit('messageRead', {
+          socket.emit("messageRead", {
             roomId: room.id,
             messageId: message.id,
           });
 
           // Notify the receiver's socket about the updated message state
-          receiverSocket.emit('messageRead', {
+          receiverSocket.emit("messageRead", {
             roomId: room.id,
             messageId: message.id,
           });
@@ -117,25 +117,51 @@ module.exports = (io, socket) => {
       }
 
       // Emit a "newMessage" event to update room details for both participants
-      const updatedRoom = {
+      // Get unread messages count for the sender (should always be 0)
+      const senderUnreadCount = await Message.count({
+        where: { read: false, ReceiverId: senderId, RoomId: room.id },
+      });
+
+      // Get unread messages count for the receiver
+      const receiverUnreadCount = await Message.count({
+        where: { read: false, ReceiverId: receiverId, RoomId: room.id },
+      });
+
+      // Prepare updated room details for the sender
+      const updatedRoomForSender = {
         roomId: room.id,
+        senderId, // Include senderId
+        receiverId, // Include receiverId
         lastMessage: {
           content: message.message_text,
           timestamp: message.createdAt,
           isRead: messagePayload.message.isRead,
         },
-        unreadMessages: room.Messages ? room.Messages.length : 0,
+        unreadMessages: senderUnreadCount, // Sender should always see 0 unread messages
       };
 
-      // Emit to both participants
-      socket.emit('newMessage', updatedRoom);
+      // Prepare updated room details for the receiver
+      const updatedRoomForReceiver = {
+        roomId: room.id,
+        senderId, // Include senderId
+        receiverId, // Include receiverId
+        lastMessage: {
+          content: message.message_text,
+          timestamp: message.createdAt,
+          isRead: messagePayload.message.isRead,
+        },
+        unreadMessages: receiverUnreadCount, // Receiver sees actual unread count
+      };
+
+      // Emit separately to both users
+      socket.emit("newMessage", updatedRoomForSender); // Send update to sender
       if (receiverSocket) {
-        receiverSocket.emit('newMessage', updatedRoom);
+        receiverSocket.emit("newMessage", updatedRoomForReceiver); // Send update to receiver
       }
 
       console.log({ success: true, data: message });
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error("Error sending message:", error);
     }
   });
 };
