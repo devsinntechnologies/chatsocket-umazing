@@ -27,6 +27,12 @@ module.exports = (io, socket) => {
             as: 'User2', // Alias for user_2
             attributes: ['id', 'name', 'email', 'imageUrl'],
           },
+          {
+            model: Message,
+            as: 'Messages',
+            where: { read: false, ReceiverId: receiverId },
+            required: false, 
+          },
         ],
       });
 
@@ -118,9 +124,7 @@ module.exports = (io, socket) => {
           timestamp: message.createdAt,
           isRead: messagePayload.message.isRead,
         },
-        unreadMessages: room.Messages.filter(
-          (message) => message.read === false && message.ReceiverId === senderId
-        ).length,
+        unreadMessages: room.Messages ? room.Messages.length : 0,
       };
 
       // Emit to both participants
